@@ -1,13 +1,12 @@
 """
 This file contains the actual Tinker08 mass function. It uses emu to get the mass function parameters.
 """
-import cosmocalc as cc
-from classy import Class
-from cluster_toolkit import bias
+#from classy import Class
+#from cluster_toolkit import bias
 import numpy as np
-from scipy import special, integrate
+from scipy import special#, integrate
 from scipy.interpolate import InterpolatedUnivariateSpline as IUS
-from scipy.interpolate import RectBivariateSpline as RBS
+#from scipy.interpolate import RectBivariateSpline as RBS
 #from scipy.interpolate import interp2d as RBS
 import emu
 
