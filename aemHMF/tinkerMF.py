@@ -77,7 +77,7 @@ class tinkerMF(object):
         return (M/(4./3.*np.pi*self.rhom))**(1./3.)/self.cosmo_dict['h'] #Lagrangian radius in Mpc
 
     def Mtosigma(self, M, a):
-            return self.sigma_obj.sigmaMtophat(M, a)
+        return self.sigma_obj.sigmaMtophat(M, a)
         
     def Gsigma(self, sigma, a):
         if not hasattr(self, "a"):
