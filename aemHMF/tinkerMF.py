@@ -17,15 +17,23 @@ rhocrit = 3.*(Mpcperkm*100)**2/(8*np.pi*G) #Msun h^2/Mpc^3
 
 class tinkerMF(object):
     
-    def __init__(self):
+    def __init__(self, tinker=False, sigma_obj=None):
         self.t_08 = emu.emu()
+        self.tinker = tinker
+
+        self.sigma_obj = sigma_obj
+        if sigma_obj is None:
+            import cosmocalc
+            self.sigma_obj = cosmocalc
+
 
     def set_cosmology(self, cosmo_dict):
         self.cosmo_dict = cosmo_dict
         self.rhom = cosmo_dict['om']*rhocrit #Msun h^2/Mpc^3
-        cc.set_cosmology(cosmo_dict)
-        cos = self.cos_from_dict(cosmo_dict)
-        self.t08_slopes_intercepts = self.t_08.predict_slopes_intercepts(cos)
+        self.t08_slopes_intercepts = \
+            self.t_08.predict_slopes_intercepts(
+                    self.cos_from_dict(cosmo_dict))
+        self.sigma_obj.set_cosmology(cosmo_dict)
         
     def cos_from_dict(self, cosmo_dict):
         cd = cosmo_dict
@@ -53,12 +61,15 @@ class tinkerMF(object):
         return
         
     def merge_t08_params(self, a):
-        k = a-0.5
-        d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
-        d = d0 + k*d1
-        e = np.array([1.0]) #Default Tinker08 value
-        f = f0 + k*f1
-        g = g0 + k*g1
+        if self.tinker:
+            d, e, f, g = 1.97, 1.00, 0.51, 1.228
+        else:
+            k = a-0.5
+            d0,d1,f0,f1,g0,g1 = self.t08_slopes_intercepts
+            d = d0 + k*d1
+            e = np.array([1.0]) #Default Tinker08 value
+            f = f0 + k*f1
+            g = g0 + k*g1
         self.t08_params = np.array([d, e, f, g]).flatten()
         return
 
@@ -66,7 +77,7 @@ class tinkerMF(object):
         return (M/(4./3.*np.pi*self.rhom))**(1./3.)/self.cosmo_dict['h'] #Lagrangian radius in Mpc
 
     def Mtosigma(self, M, a):
-            return cc.sigmaMtophat(M, a)
+            return self.sigma_obj.sigmaMtophat(M, a)
         
     def Gsigma(self, sigma, a):
         if not hasattr(self, "a"):
